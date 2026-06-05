@@ -3,25 +3,44 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Colors */
+  --color-gold: #C9A84C;
+  --color-gold-light: #F5E6C3;
+  --color-black: #0A0A0A;
+  --color-dark: #1A1A1A;
+  --color-surface: #111111;
+  --color-text-primary: #FFFFFF;
+  --color-text-muted: #888888;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Typography */
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Animation */
+  --animation-ease: power3.out;
+  --animation-duration: 0.8s;
+  --animation-stagger: 0.1s;
+
+  /* Spacing */
+  --section-padding: clamp(4rem, 8vw, 8rem);
+
+  /* Legacy tokens (kept for compatibility) */
+  --background: var(--color-black);
+  --foreground: var(--color-text-primary);
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-text-primary);
+  background: var(--color-black);
+  font-family: var(--font-body);
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.mobile-nav-panel {
+  background-color: #0a0a0a !important;
 }
