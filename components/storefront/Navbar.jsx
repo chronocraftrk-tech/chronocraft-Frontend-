@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import useCartStore from '@/lib/store/cartStore';
 import useWishlistStore from '@/lib/store/wishlistStore';
 
-export default function Navbar() {
+export default function Navbar({ hideMobileMenu = false }) {
   const { data: session } = useSession();
   const cartItems      = useCartStore((s) => s.items);
   const wishlistItems  = useWishlistStore((s) => s.items);
@@ -43,15 +43,17 @@ export default function Navbar() {
             {/* Left: hamburger + logo */}
             <div className="flex items-center gap-4">
               {/* Hamburger */}
-              <button
-                onClick={() => setIsMobileMenuOpen(true)}
-                className="md:hidden text-white/70 hover:text-[#C9A84C] focus:outline-none p-1 transition-colors duration-300"
-                aria-label="Open navigation menu"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
+              {!hideMobileMenu && (
+                <button
+                  onClick={() => setIsMobileMenuOpen(true)}
+                  className="md:hidden text-white/70 hover:text-[#C9A84C] focus:outline-none p-1 transition-colors duration-300"
+                  aria-label="Open navigation menu"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                </button>
+              )}
 
               {/* Logo */}
               <Link
