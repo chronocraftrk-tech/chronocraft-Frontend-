@@ -273,7 +273,7 @@ export default function Navbar({ hideMobileMenu = false }) {
           <div className="px-6 py-5 border-t border-[#C9A84C]/10">
             <p className="font-display text-[10px] text-[#C9A84C] tracking-widest uppercase mb-1">Premium Luxury Watches</p>
             <p className="text-white/30 font-body text-[10px] leading-relaxed">
-              India's premier luxury watch destination.
+              India&apos;s premier luxury watch destination.
             </p>
           </div>
         </div>
