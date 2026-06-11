@@ -69,16 +69,8 @@ function ShopContent() {
 
   // Sync filters to URL without triggering Next.js router navigation/suspense
   const updateUrl = useCallback((newFilters, newSearch) => {
-    const params = new URLSearchParams();
-    if (newFilters.brands.length) params.set('brands', newFilters.brands.join(','));
-    if (newFilters.genders.length) params.set('genders', newFilters.genders.join(','));
-    if (newFilters.minPrice) params.set('minPrice', newFilters.minPrice);
-    if (newFilters.maxPrice) params.set('maxPrice', newFilters.maxPrice);
-    if (newFilters.sort && newFilters.sort !== 'newest') params.set('sort', newFilters.sort);
-    if (newSearch) params.set('q', newSearch);
-    const queryString = params.toString();
-    const url = queryString ? `/shop?${queryString}` : '/shop';
-    window.history.replaceState(null, '', url);
+    // The user explicitly requested to keep URLs clean without huge query parameters
+    window.history.replaceState(null, '', '/shop');
   }, []);
 
   // Fetch products

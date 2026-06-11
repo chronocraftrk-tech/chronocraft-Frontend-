@@ -19,6 +19,8 @@ export default function AdminDashboardPage() {
   
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [orderFilter, setOrderFilter] = useState('All');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
   const [users, setUsers] = useState([]);
   const [whatsappLogs, setWhatsappLogs] = useState([]);
   const [reviews, setReviews] = useState([]);
@@ -379,6 +381,41 @@ export default function AdminDashboardPage() {
     setReviewModalOpen(true);
   };
 
+  const handleAutoGenerateReview = () => {
+    if (!reviewForm.reviewerName) {
+      alert('Please enter a Reviewer Name first.');
+      return;
+    }
+    const nameSearch = reviewForm.reviewerName.toLowerCase();
+    
+    // Find an order by this customer
+    const order = orders.find(o => 
+      o.userId && o.userId.name && o.userId.name.toLowerCase().includes(nameSearch)
+    );
+    
+    if (order && order.items && order.items.length > 0) {
+      const watchName = order.items[0].name;
+      const location = order.shippingAddress?.city || 'Verified Buyer';
+      const quotes = [
+        `Absolutely amazing experience with Chronocraft! My ${watchName} arrived in perfect condition and exceeded all expectations.`,
+        `I recently purchased the ${watchName} and I couldn't be happier. The service was impeccable from start to finish.`,
+        `Stunning timepiece! The ${watchName} is exactly as described. Highly recommend buying from Chronocraft.`,
+        `I've been looking for a ${watchName} for a while, and Chronocraft delivered exactly what I wanted. Fast shipping and great communication.`,
+        `The craftsmanship on my new ${watchName} is unbelievable. Chronocraft made the entire buying process a breeze. A+ seller!`
+      ];
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      
+      setReviewForm(prev => ({
+        ...prev,
+        reviewerName: order.userId.name,
+        quote: randomQuote,
+        reviewerLocation: prev.reviewerLocation || location
+      }));
+    } else {
+      alert('No matching order found for this name. Please ensure the user has placed an order.');
+    }
+  };
+
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setActionLoading(true);
@@ -448,7 +485,7 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] text-white flex">
+    <div className="h-screen overflow-hidden bg-[#0A0A0A] text-white flex">
       {/* Mobile Menu Toggle Button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -477,7 +514,7 @@ export default function AdminDashboardPage() {
       <aside className={`
         fixed md:static inset-y-0 left-0
         w-64 bg-[#111111] border-r border-white/5 
-        flex flex-col justify-between shrink-0
+        flex flex-col justify-between shrink-0 overflow-y-auto
         transform transition-transform duration-300 ease-in-out
         z-30
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
@@ -620,7 +657,10 @@ export default function AdminDashboardPage() {
                     <div className="bg-[#111111] border border-white/5 p-6">
                       <h3 className="font-display text-lg font-semibold mb-4">Low Stock Alerts</h3>
                       {lowStock.length === 0 ? (
-                        <p className="text-emerald-400 text-sm font-body">✓ All items well-stocked</p>
+                        <p className="text-emerald-400 text-sm font-body flex items-center justify-center gap-1.5">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          All items well-stocked
+                        </p>
                       ) : (
                         <div className="space-y-4">
                           {lowStock.map((p) => (
@@ -703,13 +743,41 @@ export default function AdminDashboardPage() {
               )}
 
               {/* ── Tab: Orders ──────────────────────────────────────────────── */}
-              {activeTab === 'Orders' && (
+              {activeTab === 'Orders' && (() => {
+                const filteredOrders = orders.filter(o => {
+                  const statusMatch = orderFilter === 'All' || o.status.toLowerCase() === orderFilter.toLowerCase();
+                  const searchMatch = !orderSearchQuery || o.orderNumber.toLowerCase().includes(orderSearchQuery.toLowerCase());
+                  return statusMatch && searchMatch;
+                });
+                return (
                 <div className="space-y-4">
                   {/* Header bar with count + refresh */}
-                  <div className="flex items-center justify-between">
-                    <p className="text-white/40 font-body text-sm">
-                      {orders.length === 0 ? 'No orders yet' : `${orders.length} order${orders.length !== 1 ? 's' : ''} received`}
-                    </p>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <p className="text-white/40 font-body text-sm">
+                        {filteredOrders.length === 0 ? 'No orders found' : `${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''} found`}
+                      </p>
+                      <input
+                        type="text"
+                        placeholder="Search by Order ID..."
+                        value={orderSearchQuery}
+                        onChange={(e) => setOrderSearchQuery(e.target.value)}
+                        className="bg-[#1A1A1A] border border-white/10 px-3 py-1.5 text-white font-body text-sm focus:outline-none focus:border-[#C9A84C]"
+                      />
+                      <select
+                        value={orderFilter}
+                        onChange={(e) => setOrderFilter(e.target.value)}
+                        className="bg-[#1A1A1A] border border-white/10 px-3 py-1.5 text-white font-body text-sm focus:outline-none focus:border-[#C9A84C]"
+                      >
+                        <option value="All">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
                     <button
                       onClick={fetchData}
                       className="flex items-center gap-2 text-xs text-[#C9A84C] border border-[#C9A84C]/20 px-3 py-1.5 hover:bg-[#C9A84C]/5 transition-colors font-body uppercase tracking-wider"
@@ -721,19 +789,19 @@ export default function AdminDashboardPage() {
                     </button>
                   </div>
 
-                  {orders.length === 0 ? (
+                  {filteredOrders.length === 0 ? (
                     <div className="bg-[#111111] border border-white/5 p-12 text-center">
                       <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
                         <svg className="w-8 h-8 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                       </div>
-                      <p className="text-white/30 font-body">No orders received yet.</p>
-                      <p className="text-white/20 font-body text-xs mt-1">Orders placed by customers will appear here automatically.</p>
+                      <p className="text-white/30 font-body">No orders found matching this filter.</p>
+                      <p className="text-white/20 font-body text-xs mt-1">Try changing your filter settings.</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {orders.map((o) => (
+                      {filteredOrders.map((o) => (
                         <div key={o._id} className="bg-[#111111] border border-white/5 hover:border-[#C9A84C]/20 transition-colors">
                           {/* Order header row */}
                           <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-white/5">
@@ -811,6 +879,16 @@ export default function AdminDashboardPage() {
 
                             {/* Shipping + Total */}
                             <div className="space-y-3">
+                              {o.userId && (
+                                <div>
+                                  <p className="text-[#C9A84C]/80 text-xs font-body uppercase tracking-wider mb-1">Customer Account</p>
+                                  <p className="text-white/80 text-xs font-body leading-relaxed bg-white/5 p-2 rounded-sm mb-3">
+                                    <span className="text-white/40">Name:</span> {o.userId.name || 'N/A'}<br />
+                                    <span className="text-white/40">Email:</span> {o.userId.email || 'N/A'}<br />
+                                    <span className="text-white/40">Phone:</span> {o.userId.phone || 'N/A'}
+                                  </p>
+                                </div>
+                              )}
                               {o.shippingAddress && (
                                 <div>
                                   <p className="text-white/30 text-xs font-body uppercase tracking-wider mb-1">Ship To</p>
@@ -844,7 +922,8 @@ export default function AdminDashboardPage() {
                     </div>
                   )}
                 </div>
-              )}
+                );
+              })()}
 
               {/* ── Tab: Users ───────────────────────────────────────────────── */}
               {activeTab === 'Users' && (
@@ -979,9 +1058,10 @@ export default function AdminDashboardPage() {
               </h3>
               <button
                 onClick={() => setProductModalOpen(false)}
-                className="text-white/30 hover:text-white font-body text-sm"
+                className="text-white/30 hover:text-white font-body text-sm flex items-center gap-1.5 transition-colors"
               >
-                ✕ Close
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                Close
               </button>
             </div>
             
@@ -1279,9 +1359,9 @@ export default function AdminDashboardPage() {
                       <p className="text-indigo-300 text-xs font-semibold font-body uppercase tracking-wider">Auto-Progression Active</p>
                       <p className="text-indigo-300/70 text-xs font-body mt-0.5 leading-relaxed">
                         Once confirmed, the system will automatically advance this order:
-                        <br />· <span className="text-white/60">+4 h</span> → Processing
-                        · <span className="text-white/60">+12 h</span> → Shipped
-                        · <span className="text-white/60">+24 h</span> → Delivered
+                        <br />· <span className="text-white/60">+1 d</span> → Processing
+                        · <span className="text-white/60">+2 d</span> → Shipped
+                        · <span className="text-white/60">+3 d</span> → Delivered
                       </p>
                     </div>
                   </div>
@@ -1297,10 +1377,10 @@ export default function AdminDashboardPage() {
                   className="w-full bg-[#1A1A1A] border border-white/10 px-3 py-2.5 text-white focus:outline-none focus:border-[#C9A84C]"
                 >
                   {[
-                    { value: 'pending',  label: '⏳ Pending'  },
-                    { value: 'paid',     label: '✅ Paid'     },
-                    { value: 'failed',   label: '❌ Failed'   },
-                    { value: 'refunded', label: '↩️ Refunded' },
+                    { value: 'pending',  label: 'Pending'  },
+                    { value: 'paid',     label: 'Paid'     },
+                    { value: 'failed',   label: 'Failed'   },
+                    { value: 'refunded', label: 'Refunded' },
                   ].map((ps) => (
                     <option key={ps.value} value={ps.value}>{ps.label}</option>
                   ))}
@@ -1348,8 +1428,9 @@ export default function AdminDashboardPage() {
               <h3 className="font-display text-xl font-bold uppercase tracking-wider text-[#C9A84C]">
                 {editingReview ? 'Edit Review' : 'Add Review'}
               </h3>
-              <button onClick={() => setReviewModalOpen(false)} className="text-white/30 hover:text-white font-body text-sm">
-                ✕ Close
+              <button onClick={() => setReviewModalOpen(false)} className="text-white/30 hover:text-white font-body text-sm flex items-center gap-1.5 transition-colors">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                Close
               </button>
             </div>
             <form onSubmit={handleReviewSubmit} className="p-6 space-y-4 font-body text-sm">
@@ -1397,7 +1478,17 @@ export default function AdminDashboardPage() {
               </div>
 
               <div>
-                <label className="block text-white/40 text-xs uppercase tracking-wider mb-2">Review Quote *</label>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-white/40 text-xs uppercase tracking-wider">Review Quote *</label>
+                  <button
+                    type="button"
+                    onClick={handleAutoGenerateReview}
+                    className="text-xs text-[#C9A84C] hover:text-[#F5E6C3] uppercase tracking-wider font-semibold transition-colors flex items-center gap-1.5"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                    Auto-Generate
+                  </button>
+                </div>
                 <textarea
                   required value={reviewForm.quote} rows={4}
                   onChange={(e) => setReviewForm({ ...reviewForm, quote: e.target.value })}

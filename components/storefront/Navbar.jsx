@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import useCartStore from '@/lib/store/cartStore';
 import useWishlistStore from '@/lib/store/wishlistStore';
@@ -38,7 +39,7 @@ export default function Navbar({ hideMobileMenu = false }) {
         style={{ backgroundColor: '#0A0A0A' }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20 md:h-24">
 
             {/* Left: hamburger + logo */}
             <div className="flex items-center gap-4">
@@ -58,9 +59,16 @@ export default function Navbar({ hideMobileMenu = false }) {
               {/* Logo */}
               <Link
                 href="/"
-                className="font-display text-xl font-bold text-[#C9A84C] tracking-widest uppercase hover:scale-105 transition-transform duration-300"
+                className="flex items-center hover:scale-105 transition-transform duration-300"
               >
-                Chrono Craft
+                <Image 
+                  src="/images/image.png" 
+                  alt="Chrono Craft Logo" 
+                  width={200} 
+                  height={200} 
+                  className="w-auto h-14 md:h-16 lg:h-20 object-contain py-1" 
+                  priority
+                />
               </Link>
             </div>
 
@@ -186,9 +194,13 @@ export default function Navbar({ hideMobileMenu = false }) {
         >
           {/* Drawer header */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-[#C9A84C]/10">
-            <span className="font-display text-base font-bold text-[#C9A84C] tracking-widest uppercase">
-              Chrono Craft
-            </span>
+            <Image 
+              src="/images/image.png" 
+              alt="Chrono Craft Logo" 
+              width={500} 
+              height={500} 
+              className="w-auto h-[50px] object-contain" 
+            />
             <button
               onClick={closeMenu}
               className="text-white/50 hover:text-[#C9A84C] focus:outline-none transition-all duration-300 hover:rotate-90"

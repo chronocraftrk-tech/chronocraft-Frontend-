@@ -207,7 +207,7 @@ export default function ForgotPasswordPage() {
                           'bg-white/5 border border-white/10 text-white/30'
                         }`}
                       >
-                        {done ? '✓' : i + 1}
+                        {done ? <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg> : i + 1}
                       </div>
                       <span className={`text-[9px] font-body uppercase tracking-wider mt-1.5 ${active ? 'text-[#C9A84C]' : 'text-white/20'}`}>
                         {s.label}
@@ -368,7 +368,7 @@ export default function ForgotPasswordPage() {
           {step === STEPS.DONE && (
             <div className="text-center space-y-6 py-4">
               <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto">
-                <span className="text-emerald-400 text-xl">✓</span>
+                <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </div>
               <div>
                 <h2 className="text-white font-display text-lg font-bold mb-2 uppercase tracking-wide">Password Reset!</h2>

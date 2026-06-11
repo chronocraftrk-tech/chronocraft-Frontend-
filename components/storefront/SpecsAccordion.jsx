@@ -60,7 +60,7 @@ export default function SpecsAccordion({ product }) {
           <ul className="space-y-1">
             {product.includedItems.map((item, i) => (
               <li key={i} className="flex items-center gap-2">
-                <span className="text-[#C9A84C]">✓</span>
+                <svg className="w-4 h-4 text-[#C9A84C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                 {item}
               </li>
             ))}

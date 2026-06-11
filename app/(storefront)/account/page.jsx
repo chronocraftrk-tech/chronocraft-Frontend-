@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/storefront/Navbar';
 import Footer from '@/components/storefront/Footer';
+import OrderTimeline from '@/components/storefront/OrderTimeline';
 import useWishlistStore from '@/lib/store/wishlistStore';
 import useCartStore from '@/lib/store/cartStore';
 
@@ -528,29 +529,38 @@ function AccountPageInner() {
                     <div className="space-y-3">
                       <p className="text-white/30 font-body text-xs uppercase tracking-wider mb-4">{orders.length} order{orders.length !== 1 ? 's' : ''}</p>
                       {orders.map((order) => (
-                        <a key={order._id} href={`/orders/${order._id}`}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111111] border border-white/5 hover:border-[#C9A84C]/30 p-5 transition-all duration-200 group">
-                          <div>
-                            <div className="flex items-center gap-3 mb-1">
-                              <p className="font-display text-white font-semibold group-hover:text-[#C9A84C] transition-colors">{order.orderNumber}</p>
-                              <span className={`text-[10px] font-body font-semibold uppercase tracking-wider px-2 py-0.5 ${STATUS_BADGE[order.status] || 'bg-white/10 text-white/60'}`}>
-                                {order.status}
-                              </span>
+                        <div key={order._id} className="mb-4">
+                          <a href={`/orders/${order._id}`}
+                            className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111111] border border-white/5 hover:border-[#C9A84C]/30 p-5 transition-all duration-200 group">
+                            <div>
+                              <div className="flex items-center gap-3 mb-1">
+                                <p className="font-display text-white font-semibold group-hover:text-[#C9A84C] transition-colors">{order.orderNumber}</p>
+                                <span className={`text-[10px] font-body font-semibold uppercase tracking-wider px-2 py-0.5 ${STATUS_BADGE[order.status] || 'bg-white/10 text-white/60'}`}>
+                                  {order.status}
+                                </span>
+                              </div>
+                              <p className="text-white/30 font-body text-xs">
+                                {order?.createdAt
+                                  ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+                                  : 'N/A'}
+                                {order?.items ? ` · ${order.items.map((i) => `${i.name} ×${i.quantity}`).join(', ')}` : ''}
+                              </p>
                             </div>
-                            <p className="text-white/30 font-body text-xs">
-                              {order?.createdAt
-                                ? new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
-                                : 'N/A'}
-                              {order?.items ? ` · ${order.items.map((i) => `${i.name} ×${i.quantity}`).join(', ')}` : ''}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-3 shrink-0">
-                            <span className="font-display text-[#C9A84C] font-semibold">₹{order.total.toLocaleString('en-IN')}</span>
-                            <svg className="w-4 h-4 text-white/20 group-hover:text-[#C9A84C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </div>
-                        </a>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="font-display text-[#C9A84C] font-semibold">₹{order.total.toLocaleString('en-IN')}</span>
+                              <svg className="w-4 h-4 text-white/20 group-hover:text-[#C9A84C] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </a>
+                          
+                          {/* Order Timeline below the order if in progress or completed */}
+                          {['confirmed', 'processing', 'shipped', 'delivered'].includes(order.status) && (
+                            <div className="bg-[#111111] border border-white/5 border-t-0 p-6 pt-4">
+                              <OrderTimeline status={order.status} statusHistory={order.statusHistory || []} />
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
                   )}
@@ -569,7 +579,9 @@ function AccountPageInner() {
                         </svg>
                       </div>
                       <p className="text-white/40 font-body mb-1">Your wishlist is empty</p>
-                      <p className="text-white/20 font-body text-xs mb-5">Tap the ♥ on any watch to save it here</p>
+                      <p className="text-white/20 font-body text-xs mb-5 flex items-center justify-center gap-1">
+                        Tap the <svg className="w-3 h-3 text-white/40" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg> on any watch to save it here
+                      </p>
                       <a href="/shop" className="px-6 py-2.5 bg-[#C9A84C] text-black font-body font-semibold text-xs uppercase tracking-wider hover:bg-[#F5E6C3] transition-colors">
                         Explore Watches
                       </a>

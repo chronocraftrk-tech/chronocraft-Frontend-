@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Footer() {
   const year = new Date().getFullYear();
@@ -10,8 +11,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="font-display text-2xl font-bold text-[#C9A84C] tracking-widest uppercase block mb-4">
-              Chrono Craft
+            <Link href="/" className="block mb-4 hover:opacity-90 transition-opacity w-fit">
+              <Image 
+                src="/images/image.png" 
+                alt="Chrono Craft Logo" 
+                width={200} 
+                height={200} 
+                className="w-auto h-16 md:h-20 lg:h-24 object-contain" 
+              />
             </Link>
             <p className="text-white/40 font-body text-sm leading-relaxed">
               India&apos;s premier destination for authenticated brand-new luxury timepieces.

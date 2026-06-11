@@ -201,8 +201,9 @@ export default function ProductDetailPage() {
 
               {/* Stock */}
               {!isOutOfStock && (
-                <p className="text-emerald-400 text-sm font-body mb-4">
-                  ✓ {product.stock} in stock — ready to ship
+                <p className="text-emerald-400 text-sm font-body mb-4 flex items-center gap-1.5">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  {product.stock} in stock — ready to ship
                 </p>
               )}
 
@@ -249,8 +250,9 @@ export default function ProductDetailPage() {
 
                 {/* Wishlist status label */}
                 {isWishlisted && (
-                  <p className="text-red-400/70 font-body text-xs text-center">
-                    ♥ Saved to your wishlist
+                  <p className="text-red-400/70 font-body text-xs text-center flex items-center justify-center gap-1.5">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                    Saved to your wishlist
                   </p>
                 )}
 
